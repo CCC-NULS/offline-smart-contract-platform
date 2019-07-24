@@ -1,5 +1,6 @@
 package io.nuls.contract.autoconfig;
 
+import io.nuls.core.log.Log;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,8 @@ public class ApiModuleInfoConfig  implements InitializingBean {
 
     @Value("${assetChainId}")
     private String assetChainId;
+
+    private String defaultJarFilePath;
 
     public String getApiModuleApi() {
         return apiModuleApi;
@@ -134,6 +137,14 @@ public class ApiModuleInfoConfig  implements InitializingBean {
 
     public void setAssetChainId(String assetChainId) {
         this.assetChainId = assetChainId;
+    }
+
+    public String getDefaultJarFilePath() {
+        return defaultJarFilePath;
+    }
+
+    public void setDefaultJarFilePath(String defaultJarFilePath) {
+        this.defaultJarFilePath = defaultJarFilePath;
     }
 
     @Override

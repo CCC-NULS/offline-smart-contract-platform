@@ -83,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
         }
         Account account=accountPo.toAccount();
         //The account is encrypted, verify password
-        if (!account.validatePassword(password)) {
+        if (account.isEncrypted()&&!account.validatePassword(password)) {
             throw new NulsRuntimeException(RpcErrorCode.PASSWORD_IS_WRONG);
         }
         boolean result;
@@ -180,8 +180,8 @@ public class AccountServiceImpl implements AccountService {
     public boolean validationPassword(int chainId, String address, String password) {
         byte[] addressBytes = AddressTool.getAddress(address);
         AccountPo accountPo=accountStorageService.getAccount(addressBytes);
-        boolean result=false;
-        if(accountPo!=null){
+        boolean result=true;
+        if(accountPo!=null&&accountPo.isEncrypted()){
             result =accountPo.validatePassword(password);
         }
         return result;
@@ -195,7 +195,7 @@ public class AccountServiceImpl implements AccountService {
         if (!AddressTool.validAddress(chainId, keyStore.getAddress())) {
             throw new NulsException(RpcErrorCode.ADDRESS_ERROR);
         }
-        if (!FormatValidUtils.validPassword(password)) {
+        if (StringUtils.isNotBlank(password)&&!FormatValidUtils.validPassword(password)) {
             throw new NulsException(RpcErrorCode.PASSWORD_IS_WRONG);
         }
         if (!overwrite) {
@@ -239,7 +239,10 @@ public class AccountServiceImpl implements AccountService {
             throw new NulsException(RpcErrorCode.PARAMETER_ERROR);
         }
 
-        account.encrypt(password);
+        if(StringUtils.isNotBlank(password)){
+            account.encrypt(password);
+        }
+
         accountStorageService.saveAccount(new AccountPo(account));
 
         //backup account to keystore
@@ -254,7 +257,7 @@ public class AccountServiceImpl implements AccountService {
         if (!ECKey.isValidPrivteHex(prikey)) {
             throw new NulsException(RpcErrorCode.PRIVATE_KEY_WRONG);
         }
-        if (!FormatValidUtils.validPassword(password)) {
+        if (StringUtils.isNotBlank(password)&&!FormatValidUtils.validPassword(password)) {
             throw new NulsException(RpcErrorCode.PASSWORD_IS_WRONG);
         }
         //not allowed to cover
@@ -270,7 +273,9 @@ public class AccountServiceImpl implements AccountService {
         Account account = AccountTool.createAccount(chainId, prikey);
 
         //encrypting account private key
-        account.encrypt(password);
+        if(StringUtils.isNotBlank(password)){
+            account.encrypt(password);
+        }
 
         //save account to storage
         accountStorageService.saveAccount(new AccountPo(account));
@@ -293,7 +298,7 @@ public class AccountServiceImpl implements AccountService {
             byte[] priKeyBytes = account.getPriKey(password);
             return HexUtil.encode(priKeyBytes);
         } else {
-            return null;
+            return  HexUtil.encode(account.getPriKey());
         }
     }
 

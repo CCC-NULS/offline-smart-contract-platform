@@ -22,7 +22,10 @@ public class ApiModuleInitTool {
     @Autowired
     private ApiModuleInfoConfig infoConfig;
 
-    public void init() throws Exception{
+    public void init(String[] args) throws Exception{
+        if(args!=null && args.length>0){
+            infoConfig.setDefaultJarFilePath(args[0]);
+        }
         loadLanguage();
         initDB();
     }
@@ -31,6 +34,7 @@ public class ApiModuleInitTool {
     private void loadLanguage(){
         I18nUtils.loadLanguage(this.getClass(), "languages",infoConfig.getLanguage());
     }
+
     /**
      * 初始化数据库
      * Initialization database

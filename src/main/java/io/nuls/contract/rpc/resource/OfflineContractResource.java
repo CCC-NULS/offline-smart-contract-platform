@@ -37,6 +37,8 @@ public interface OfflineContractResource {
 
     public Map createContract(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "assetChainId")int assetChainId, @JsonRpcParam(value = "assetId")int assetId, @JsonRpcParam(value = "sender")String sender, @JsonRpcParam(value = "password")String password, @JsonRpcParam(value = "contractCode")String contractCode, @JsonRpcParam(value = "alias")String alias, @JsonRpcParam(value = "args")Object[] args, @JsonRpcParam(value = "gasLimit")long gasLimit, @JsonRpcParam(value = "price")long price, @JsonRpcParam(value = "remark")String remark);
 
+    public Map getDefaultContractCode();
+
     public Map imputedContractCreateGas(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "sender")String sender,@JsonRpcParam(value = "contractCode")String contractCode,@JsonRpcParam(value = "args")Object[] args);
 
     public Map getContractConstructor(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "contractCode")String contractCode);

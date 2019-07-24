@@ -12,13 +12,19 @@ import java.util.Map;
 
 public class ApplicationStartup implements ApplicationListener<ContextRefreshedEvent> {
 
+   private  String[] args;
+
+    public ApplicationStartup(String[] args){
+        this.args=args;
+    }
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 
         ApiModuleInitTool dataInitTool=contextRefreshedEvent.getApplicationContext().getBean(ApiModuleInitTool.class);
         try {
             Log.info("----------run Application Startup Listener-------------");
-            dataInitTool.init();
+            dataInitTool.init(this.args);
             Map<String, JsonServiceExporter> beansOfType = contextRefreshedEvent.getApplicationContext().getBeansOfType(JsonServiceExporter.class);
             for(JsonServiceExporter bean : beansOfType.values()) {
                 bean.setErrorResolver(DefineErrorResolver.INSTANCE);

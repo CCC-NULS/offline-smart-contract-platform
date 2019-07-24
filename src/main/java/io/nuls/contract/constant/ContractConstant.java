@@ -4,4 +4,6 @@ public interface ContractConstant {
     byte UNLOCKED_TX = (byte) 0;
 
     int ENABLE = 1;
+
+    String FILE_EXT=".jar";
 }

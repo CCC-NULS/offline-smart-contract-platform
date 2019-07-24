@@ -71,7 +71,7 @@ public class AccountKeyStoreServiceImpl implements AccountKeyStoreService {
         AccountKeyStore accountKeyStore = new AccountKeyStore();
         //验证密码
         //verify the password
-        if (!account.validatePassword(password)) {
+        if (account.isEncrypted()&&!account.validatePassword(password)) {
             throw new NulsException(RpcErrorCode.PASSWORD_IS_WRONG);
         }
         //如果账户加密,不导出明文私钥

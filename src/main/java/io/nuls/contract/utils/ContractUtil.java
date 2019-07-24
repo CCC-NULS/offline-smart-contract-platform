@@ -2,8 +2,14 @@ package io.nuls.contract.utils;
 
 import io.nuls.base.data.BlockExtendsData;
 import io.nuls.base.data.BlockHeader;
+import io.nuls.core.exception.NulsRuntimeException;
 import io.nuls.core.log.Log;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -103,6 +109,19 @@ public class ContractUtil {
             return resultMsg + msgs[1].trim();
         }
         return resultMsg + errorMsg;
+    }
+
+    public static String getContractCode(File file){
+        String hexEncode="";
+        try {
+            InputStream jarFile = new FileInputStream(file);
+            byte[] contractCode= IOUtils.toByteArray(jarFile);
+            hexEncode= Hex.encodeHexString(contractCode);
+        }catch (Exception e) {
+            Log.error("parse contract code hex error.");
+            throw new NulsRuntimeException(e);
+        }
+        return hexEncode;
     }
 
 }

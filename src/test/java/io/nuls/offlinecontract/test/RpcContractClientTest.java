@@ -2,6 +2,7 @@ package io.nuls.offlinecontract.test;
 
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import io.nuls.contract.account.model.bo.ContractInfo;
+import io.nuls.contract.model.vo.ContractInfoVo;
 import io.nuls.core.parse.JSONUtils;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -65,7 +66,7 @@ public class RpcContractClientTest {
 
     @Test
     public void getContract()throws Throwable {
-        ContractInfo result=memberClient.invoke("getContract",new Object[]{chainId,contractAddress}, ContractInfo.class);
+        ContractInfoVo result=memberClient.invoke("getContract",new Object[]{chainId,contractAddress}, ContractInfoVo.class);
         System.out.println(result);
     }
 
