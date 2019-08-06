@@ -1,5 +1,7 @@
 package io.nuls.contract.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.googlecode.jsonrpc4j.JsonRpcClientException;
 import io.nuls.contract.account.model.bo.ContractInfo;
 import io.nuls.contract.model.ContractMethodArg;
 import io.nuls.contract.model.RpcErrorCode;
@@ -28,7 +30,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             result = httpClient.getRpcHttpClient().invoke("getContractConstructor",new Object[]{chainId,contractCode}, Map.class);
         }catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         if(result!=null){
             Map constructor = (Map)result.get("constructor");
@@ -51,7 +53,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             result = httpClient.getRpcHttpClient().invoke("getContractConstructor",new Object[]{chainId,contractCode}, Map.class);
         } catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         if(result!=null){
             Map constructor = (Map)result.get("constructor");
@@ -80,7 +82,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             result = httpClient.getRpcHttpClient().invoke("validateContractCreate",new Object[]{chainId,sender,gasLimit,price,contractCode,args}, Map.class);
         } catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         if(result!=null){
             boolean  successStr=(boolean) result.get("success");
@@ -104,7 +106,7 @@ public class ContractServiceImpl implements ContractService {
             }
         }catch (Throwable e){
             Log.error("call api-moudle: imputedContractCreateGas error",e);
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         return gasLimit;
     }
@@ -116,7 +118,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             result = httpClient.getRpcHttpClient().invoke("getContractMethodArgsTypes",new Object[]{chainId,contractAddress,methodname}, List.class);
         }  catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         if(result!=null){
             argsTypes =new String[result.size()];
@@ -139,7 +141,7 @@ public class ContractServiceImpl implements ContractService {
                 }
             }
         } catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         return isSuccess;
     }
@@ -159,7 +161,7 @@ public class ContractServiceImpl implements ContractService {
             }
         }catch (Throwable e){
             Log.error("call api-moudle: imputedContractCreateGas error",e);
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         return gasLimit;
     }
@@ -171,7 +173,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             result = httpClient.getRpcHttpClient().invoke("validateContractDelete",new Object[]{chainId,sender,contractAddress}, Map.class);
         } catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         if(result!=null){
             boolean  successStr=(boolean) result.get("success");
@@ -191,7 +193,7 @@ public class ContractServiceImpl implements ContractService {
         try {
             result = httpClient.getRpcHttpClient().invoke("invokeView",new Object[]{chainId,contractAddress,methodName,methodDesc,args}, Map.class);
         } catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         if(result!=null){
             if(result.containsKey("result")){
@@ -209,10 +211,20 @@ public class ContractServiceImpl implements ContractService {
         try {
             contractInfo = httpClient.getRpcHttpClient().invoke("getContract",new Object[]{chainId,contractAddress}, ContractInfo.class);
         } catch (Throwable e) {
-            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         return contractInfo;
     }
 
+    private String parseErrorMsg(Throwable e) {
+        String msg = e.getMessage();
+        if(e instanceof JsonRpcClientException) {
+            JsonNode data = ((JsonRpcClientException) e).getData();
+            if(data != null) {
+                msg = data.asText();
+            }
+        }
+        return msg;
+    }
 
 }

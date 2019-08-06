@@ -30,7 +30,7 @@ public class RpcContractClientTest {
     //private String contractAddress="tNULSeBaN15fihAZMefPMNYJyPuvYHBA1iEuka";
 
     //IDEA环境测试使用的合约地址  tNULSeBaN2DRmmBXYfD8AbqSzqsGVDZrsdgwYj2
-    private String contractAddress="tNULSeBaN46dQb3ysjzct3F4AhA8PJg9fzG5fw";
+    private String contractAddress="tNULSeBaN51kPDEKmw1wTGgWwJ23bNg1W1i9Se";
 
     private String password="nuls123456";
     private String alias="contractalias";

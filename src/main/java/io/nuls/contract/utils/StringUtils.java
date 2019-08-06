@@ -205,4 +205,27 @@ public class StringUtils {
         }
         return ignoreCase ? one.equalsIgnoreCase(theOther) : one.equals(theOther);
     }
+
+    /**
+     * 将String转为指定类型
+     *
+     * @param value        String
+     * @param defaultValue 值类型
+     * @return T 值类型
+     */
+    public static <T> T getValueByType(String value, T defaultValue) {
+        if (defaultValue instanceof Integer) {
+            return (T) ((Integer) Integer.parseInt(value));
+        } else if (defaultValue instanceof Long) {
+            return (T) ((Long) Long.parseLong(value));
+        } else if (defaultValue instanceof Float) {
+            return (T) ((Float) Float.parseFloat(value));
+        } else if (defaultValue instanceof Double) {
+            return (T) ((Double) Double.parseDouble(value));
+        } else if (defaultValue instanceof Boolean) {
+            return (T) ((Boolean) Boolean.parseBoolean(value));
+        }
+        return (T) value;
+    }
+
 }

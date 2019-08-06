@@ -14,7 +14,7 @@ import java.util.Map;
 @JsonRpcService("/offlineSmartContract")
 public interface OfflineContractResource {
 
-    public ChainInfo getChainInfo();
+    public Map setProperty(@JsonRpcParam(value = "property")String property,@JsonRpcParam(value = "value")String value);
 
     public Map createAccount(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "password")String password);
 

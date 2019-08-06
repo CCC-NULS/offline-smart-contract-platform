@@ -1,6 +1,8 @@
 package io.nuls.contract.autoconfig;
 
+import io.nuls.contract.constant.ContractConstant;
 import io.nuls.core.log.Log;
+import io.nuls.core.model.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,11 +12,12 @@ import java.io.File;
 @Component
 public class ApiModuleInfoConfig  implements InitializingBean {
 
-    @Value("${nuls.api.module.service.ip}")
-    private String apiModuleApi;
+    @Value("${nuls.api.module.service.address}")
+    private String apiModuleAddress;
 
-    @Value("${nuls.api.module.service.port}")
-    private String apiModulePort;
+    private String prevApiModuleAddress;
+
+    private boolean isCreateNewClient=false;
 
     @Value("${language}")
     private String language;
@@ -42,26 +45,39 @@ public class ApiModuleInfoConfig  implements InitializingBean {
 
     private String defaultJarFilePath;
 
-    public String getApiModuleApi() {
-        return apiModuleApi;
+    public  String  getApiModuleAddress() {
+        if(StringUtils.isNotBlank(this.apiModuleAddress) && !this.apiModuleAddress.toLowerCase().startsWith("http")){
+            this.apiModuleAddress = "http://" + this.apiModuleAddress;
+        }
+        return this.apiModuleAddress;
     }
 
-    public void setApiModuleApi(String apiModuleApi) {
-        this.apiModuleApi = apiModuleApi;
+    public void  setApiModuleAddress(String address){
+        this.prevApiModuleAddress=apiModuleAddress;
+        this.isCreateNewClient=true;
+        if(StringUtils.isNotBlank(address) && !address.toLowerCase().startsWith("http")){
+            this.apiModuleAddress = "http://" + address;
+        }else{
+            this.apiModuleAddress =address;
+        }
     }
 
-    public String getApiModulePort() {
-        return apiModulePort;
+    public String getPrevApiModuleAddress() {
+        return prevApiModuleAddress;
     }
 
-    public void setApiModulePort(String apiModulePort) {
-        this.apiModulePort = apiModulePort;
+    public boolean isCreateNewClient() {
+        return isCreateNewClient;
+    }
+
+    public void setCreateNewClient(boolean createNewClient) {
+        isCreateNewClient = createNewClient;
     }
 
     public String getLogPath() {
         //若不peoperties文件不配置此参数，则设置缺省值
         if(logPath.equals("default")){
-            logPath= System.getProperty("user.home")+ File.separator+"logs";
+            logPath= System.getProperty("user.home")+File.separator+ ContractConstant.DATA_FILE_NAME+ File.separator+"logs";
         }
         return logPath;
     }
@@ -76,11 +92,6 @@ public class ApiModuleInfoConfig  implements InitializingBean {
 
     public void setLogLevel(String logLevel) {
         this.logLevel = logLevel;
-    }
-
-    public  String  getApiModuleAddress() {
-        String url = "http://" + apiModuleApi + ":" + apiModulePort;
-        return url;
     }
 
     public String getChainId() {
@@ -102,7 +113,7 @@ public class ApiModuleInfoConfig  implements InitializingBean {
     public String getDataPath() {
         //若不peoperties文件不配置此参数，则设置缺省值
         if( dataPath.equals("default")){
-            dataPath= System.getProperty("user.home")+ File.separator+"data";
+            dataPath= System.getProperty("user.home")+File.separator+ ContractConstant.DATA_FILE_NAME+ File.separator+"data";
         }
         return dataPath;
     }
@@ -114,7 +125,7 @@ public class ApiModuleInfoConfig  implements InitializingBean {
     public String getKeystorePath() {
         //若不peoperties文件不配置此参数，则设置缺省值
         if(keystorePath.equals("default")){
-            keystorePath= System.getProperty("user.home")+ File.separator+"keystore"+ File.separator+"backup";
+            keystorePath= System.getProperty("user.home")+File.separator+ ContractConstant.DATA_FILE_NAME+ File.separator+"keystore"+ File.separator+"backup";
         }
         return keystorePath;
     }
@@ -140,6 +151,9 @@ public class ApiModuleInfoConfig  implements InitializingBean {
     }
 
     public String getDefaultJarFilePath() {
+        if(StringUtils.isBlank(defaultJarFilePath)){
+            defaultJarFilePath=System.getProperty("user.home")+File.separator+ContractConstant.PACKING_FILE_PATH;
+        }
         return defaultJarFilePath;
     }
 

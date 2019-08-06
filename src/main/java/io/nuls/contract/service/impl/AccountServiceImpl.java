@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -300,6 +298,23 @@ public class AccountServiceImpl implements AccountService {
         } else {
             return  HexUtil.encode(account.getPriKey());
         }
+    }
+
+    @Override
+    public Map<Integer, String> getPrefixFromAccountModule() throws NulsException{
+        Map<Integer, String> address_prefix_map = new HashMap<Integer, String>();
+        try {
+            List<Map<String, Object>> addressPrefixList= httpClient.getRpcHttpClient().invoke("getAllAddressPrefix",new Object[]{},List.class);
+            if (addressPrefixList!=null && addressPrefixList.size() > 0) {
+                for (Map<String, Object> addressPrefixMap : addressPrefixList) {
+                    address_prefix_map.put(Integer.valueOf(addressPrefixMap.get("chainId").toString()), String.valueOf(addressPrefixMap.get("addressPrefix")));
+                }
+            }
+        } catch (Throwable e) {
+            Log.error(e);
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+        }
+        return address_prefix_map;
     }
 
 }

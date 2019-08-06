@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ContractApplication {
     public static void main(String[] args) {
-        System.out.println("--------------start offline smart contract application--------------");
+        System.setProperty("java.awt.headless", "false");
         if(args!=null && args.length>0){
             Log.info("The default path of the smart contract jar file ："+args[0]);
         }else{
@@ -16,6 +16,5 @@ public class ContractApplication {
         SpringApplication springApplication=new SpringApplication(ContractApplication.class);
         springApplication.addListeners(new ApplicationStartup(args));
         springApplication.run(args);
-
     }
 }

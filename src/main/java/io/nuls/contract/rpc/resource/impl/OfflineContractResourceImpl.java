@@ -31,13 +31,13 @@ import io.nuls.contract.model.txdata.DeleteContractData;
 import io.nuls.contract.rpc.resource.OfflineContractResource;
 import io.nuls.contract.service.*;
 import io.nuls.contract.utils.ContractUtil;
+import io.nuls.contract.utils.StringUtils;
 import io.nuls.core.basic.Page;
 import io.nuls.core.crypto.HexUtil;
 import io.nuls.core.exception.NulsException;
 import io.nuls.core.exception.NulsRuntimeException;
 import io.nuls.core.log.Log;
 import io.nuls.core.model.FormatValidUtils;
-import io.nuls.core.model.StringUtils;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rockdb.util.DBUtils;
 import org.apache.commons.codec.binary.Hex;
@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -76,15 +77,30 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
     private ChainService chainService;
 
     @Override
-    public ChainInfo getChainInfo() {
-        try {
-            ChainInfo chainInfo=chainService.getChainInfo(null);
-            return chainInfo;
-        } catch (NulsException e) {
-            Log.error(e);
-            throw new NulsRuntimeException(e.getErrorCode());
+    public Map setProperty(String property, String value) {
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("result",false);
+        if(StringUtils.isBlank(value)||StringUtils.isBlank(property)){
+            Log.error("The values of the parameters \"property\" and \"value\" cannot be null");
+            return map;
         }
+        String setMethodName = "set" + property.substring(0,1).toUpperCase()+property.substring(1);
+        String getMethodName = "get" + property.substring(0,1).toUpperCase()+property.substring(1);
+        try{
+            Method getMethod=infoConfig.getClass().getDeclaredMethod(getMethodName);
+            Object oldVlue=getMethod.invoke(infoConfig);
+            Method setMethod =  infoConfig.getClass().getDeclaredMethod(setMethodName, new Class[]{infoConfig.getClass().getDeclaredField(property).getType()});
+            setMethod.invoke(infoConfig, new Object[]{StringUtils.getValueByType(value, infoConfig.getClass().getDeclaredField(property).getType())});
+            map.put("result",true);
+            Object newValue=getMethod.invoke(infoConfig);
+            Log.info("The value of configuration parameter \""+property+"\" changed from "+oldVlue+" to "+newValue);
+        }catch(Exception e){
+            Log.error(e);
+        }
+        return map;
     }
+
+
 
     @Override
     public Map createAccount(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "password")String password) {
@@ -343,10 +359,18 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             throw new NulsRuntimeException(RpcErrorCode.ACCOUNT_NOT_EXIST);
         }
         //账户密码验证
-        boolean validate= accountService.validationPassword(chainId,sender,password);
+/*        boolean validate= accountService.validationPassword(chainId,sender,password);
         if(!validate){
             throw new NulsRuntimeException(RpcErrorCode.VALIADE_PW_ERROR);
+        }*/
+
+        if(account.isEncrypted()){
+            if(!account.validatePassword(password)){
+                throw new NulsRuntimeException(RpcErrorCode.VALIADE_PW_ERROR);
+            }
         }
+
+
         byte[] contractCodeBytes = HexUtil.decode(contractCode);
         String[] argTypes=null;
 

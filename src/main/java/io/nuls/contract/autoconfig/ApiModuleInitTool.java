@@ -1,5 +1,7 @@
 package io.nuls.contract.autoconfig;
 
+import io.nuls.base.basic.AddressTool;
+import io.nuls.contract.account.utils.AddressPrefixDatas;
 import io.nuls.contract.constant.AccountConstant;
 import io.nuls.contract.model.RpcErrorCode;
 import io.nuls.core.exception.NulsException;
@@ -22,12 +24,16 @@ public class ApiModuleInitTool {
     @Autowired
     private ApiModuleInfoConfig infoConfig;
 
+    @Autowired
+    private AddressPrefixDatas addressPrefixDatas;
+
     public void init(String[] args) throws Exception{
         if(args!=null && args.length>0){
             infoConfig.setDefaultJarFilePath(args[0]);
         }
         loadLanguage();
         initDB();
+        AddressTool.init(addressPrefixDatas);
     }
 
 

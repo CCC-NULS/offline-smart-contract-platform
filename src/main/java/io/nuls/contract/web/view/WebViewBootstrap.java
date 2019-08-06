@@ -63,6 +63,7 @@ public class WebViewBootstrap extends Application implements Runnable, ActionLis
         startWebView(null);
     }
 
+
     //    /**
 //     * 程序入口
 //     */
@@ -96,6 +97,7 @@ public class WebViewBootstrap extends Application implements Runnable, ActionLis
                 Object application = cls.newInstance().getClass().getMethod("getApplication").invoke(null);
                 application.getClass().getMethod("setDockIconImage", java.awt.Image.class).invoke(application, dockIcon);
             } catch (Exception e) {
+                e.printStackTrace();
             }
 
         } else {
@@ -157,7 +159,7 @@ public class WebViewBootstrap extends Application implements Runnable, ActionLis
         PopupMenu popupMenu = new PopupMenu(); //创建弹出菜单对象
 
         //创建弹出菜单中的显示主窗体项.
-        MenuItem itemShow = new MenuItem("Show Client");
+        MenuItem itemShow = new MenuItem("Show Smart-Contract Client");
         itemShow.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

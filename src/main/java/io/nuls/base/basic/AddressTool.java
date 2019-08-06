@@ -34,9 +34,12 @@ import io.nuls.core.log.Log;
 import io.nuls.core.model.ByteUtils;
 import io.nuls.core.model.StringUtils;
 import io.nuls.core.parse.SerializeUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -44,18 +47,40 @@ import java.util.List;
  */
 public class AddressTool {
 
-    public static final String MAINNET_PREFIX = BaseConstant.MAINNET_DEFAULT_ADDRESS_PREFIX;
-    public static final String TESTNET_PREFIX = BaseConstant.TESTNET_DEFAULT_ADDRESS_PREFIX;
-
+    private static AddressPrefixInf addressPrefixToolsInf=null;
     private static final String ERROR_MESSAGE = "Address prefix can not be null!";
     private static final String[] LENGTHPREFIX = new String[]{"", "a", "b", "c", "d", "e"};
+    /**
+     * chainId-地址映射表
+     */
+    private static Map<Integer, String> ADDRESS_PREFIX_MAP = new HashMap<Integer, String>();
 
-    public static String getPrefix(String addressString) {
-        if (addressString.startsWith(MAINNET_PREFIX)) {
-            return MAINNET_PREFIX;
+    public static void init(AddressPrefixInf addressPrefixInf) {
+        addressPrefixToolsInf = addressPrefixInf;
+    }
+
+    public static String getPrefix(int chainId) {
+        if (chainId == BaseConstant.MAINNET_CHAIN_ID) {
+            return BaseConstant.MAINNET_DEFAULT_ADDRESS_PREFIX;
+        } else if (chainId == BaseConstant.TESTNET_CHAIN_ID) {
+            return BaseConstant.TESTNET_DEFAULT_ADDRESS_PREFIX;
+        } else {
+            if (null == ADDRESS_PREFIX_MAP.get(chainId) && null != addressPrefixToolsInf) {
+                ADDRESS_PREFIX_MAP.putAll(addressPrefixToolsInf.syncAddressPrefix());
+            }
+            if (null == ADDRESS_PREFIX_MAP.get(chainId)) {
+                return Base58.encode(SerializeUtils.int16ToBytes(chainId)).toUpperCase();
+            } else {
+                return ADDRESS_PREFIX_MAP.get(chainId);
+            }
         }
-        if (addressString.startsWith(TESTNET_PREFIX)) {
-            return TESTNET_PREFIX;
+    }
+    public static String getPrefix(String addressString) {
+        if (addressString.startsWith(BaseConstant.MAINNET_DEFAULT_ADDRESS_PREFIX)) {
+            return BaseConstant.MAINNET_DEFAULT_ADDRESS_PREFIX;
+        }
+        if (addressString.startsWith(BaseConstant.TESTNET_DEFAULT_ADDRESS_PREFIX)) {
+            return BaseConstant.TESTNET_DEFAULT_ADDRESS_PREFIX;
         }
         char[] arr = addressString.toCharArray();
         for (int i = 0; i < arr.length; i++) {
@@ -68,11 +93,11 @@ public class AddressTool {
     }
 
     private static String getRealAddrss(String addressString) {
-        if (addressString.startsWith(MAINNET_PREFIX)) {
-            return addressString.substring(MAINNET_PREFIX.length() + 1);
+        if (addressString.startsWith(BaseConstant.MAINNET_DEFAULT_ADDRESS_PREFIX)) {
+            return addressString.substring(BaseConstant.MAINNET_DEFAULT_ADDRESS_PREFIX.length() + 1);
         }
-        if (addressString.startsWith(TESTNET_PREFIX)) {
-            return addressString.substring(TESTNET_PREFIX.length() + 1);
+        if (addressString.startsWith(BaseConstant.TESTNET_DEFAULT_ADDRESS_PREFIX)) {
+            return addressString.substring(BaseConstant.TESTNET_DEFAULT_ADDRESS_PREFIX.length() + 1);
         }
         char[] arr = addressString.toCharArray();
         for (int i = 0; i < arr.length; i++) {
@@ -126,12 +151,8 @@ public class AddressTool {
      * @return
      */
     public static byte[] getAddress(byte[] publicKey, int chainId) {
-        if (chainId == 1) {
-            return getAddress(publicKey, chainId, "NULS");
-        } else if (chainId == 2) {
-            return getAddress(publicKey, chainId, "tNULS");
-        }
-        return getAddress(publicKey, chainId, Base58.encode(SerializeUtils.int16ToBytes(chainId)).toUpperCase());
+        String prefix = getPrefix(chainId);
+        return getAddress(publicKey, chainId, prefix);
     }
 
     /**
@@ -344,13 +365,8 @@ public class AddressTool {
      */
     public static String getStringAddressByBytes(byte[] addressBytes) {
         int chainId = getChainIdByAddress(addressBytes);
-        if (BaseConstant.MAINNET_CHAIN_ID == chainId) {
-            return getStringAddressByBytes(addressBytes, MAINNET_PREFIX);
-        } else if (chainId == BaseConstant.TESTNET_CHAIN_ID) {
-            return getStringAddressByBytes(addressBytes, TESTNET_PREFIX);
-        } else {
-            return getStringAddressByBytes(addressBytes, Base58.encode(SerializeUtils.int16ToBytes(chainId)).toUpperCase());
-        }
+        String prefix = getPrefix(chainId);
+        return getStringAddressByBytes(addressBytes, prefix);
     }
 
     public static String getStringAddressByBytes(byte[] addressBytes, String prefix) {

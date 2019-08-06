@@ -87,14 +87,7 @@ public class Address {
         this.addressType = addressType;
         this.hash160 = hash160;
         this.addressBytes = calcAddressbytes();
-        if (chainId == BaseConstant.MAINNET_CHAIN_ID) {
-            this.prefix = AddressTool.MAINNET_PREFIX;
-        } else if (chainId == BaseConstant.TESTNET_CHAIN_ID) {
-            this.prefix = AddressTool.TESTNET_PREFIX;
-        } else {
-            this.prefix = Base58.encode(SerializeUtils.int16ToBytes(chainId)).toUpperCase();
-        }
-
+        this.prefix = AddressTool.getPrefix(chainId);
     }
 
     public Address(int chainId, String prefix, byte addressType, byte[] hash160) {

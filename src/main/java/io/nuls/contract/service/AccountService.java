@@ -9,6 +9,7 @@ import io.nuls.contract.account.model.bo.BalanceInfo;
 import io.nuls.core.exception.NulsException;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AccountService {
 
@@ -59,4 +60,6 @@ public interface AccountService {
     String getPrivateKey(int chainId, String address, String password) throws NulsException;
 
     Account importAccountByPrikey(int chainId, String prikey, String password, boolean overwrite) throws NulsException;
+
+    Map<Integer, String> getPrefixFromAccountModule() throws NulsException;
 }
