@@ -1,5 +1,7 @@
 package io.nuls.contract.service.impl;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import io.nuls.contract.autoconfig.ApiModuleInfoConfig;
 import io.nuls.contract.utils.StringUtils;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.util.HashMap;
 
 @Service
 public class HttpClient {
@@ -23,7 +26,9 @@ public class HttpClient {
             System.out.println(infoConfig.isCreateNewClient());
             String accessPath=infoConfig.getApiModuleAddress();
             Log.info("init api module service path: "+accessPath);
-            rpcHttpClient=new JsonRpcHttpClient(new URL(accessPath));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            rpcHttpClient=new JsonRpcHttpClient(objectMapper,new URL(accessPath),new HashMap());
         }catch (Exception e){
             Log.error(e);
         }
@@ -35,7 +40,9 @@ public class HttpClient {
             String nowUrl=infoConfig.getApiModuleAddress();
             if(infoConfig.isCreateNewClient()&&StringUtils.isNotBlank(prevUrl)&&!prevUrl.equals(nowUrl)){
                 Log.info("now api module service path: "+nowUrl);
-                rpcHttpClient=new JsonRpcHttpClient(new URL(nowUrl));
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                rpcHttpClient=new JsonRpcHttpClient(objectMapper,new URL(nowUrl),new HashMap());
                 infoConfig.setCreateNewClient(false);
             }
         }catch (Exception e){
@@ -43,4 +50,5 @@ public class HttpClient {
         }
         return rpcHttpClient;
     }
+
 }
