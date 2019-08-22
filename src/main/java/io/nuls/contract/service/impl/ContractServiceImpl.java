@@ -105,7 +105,7 @@ public class ContractServiceImpl implements ContractService {
                 gasLimit=(int)result.get("gasLimit");
             }
         }catch (Throwable e){
-            Log.error("call api-moudle: imputedContractCreateGas error",e);
+            Log.error("call api-moudle: imputedContractCreateGas error",e.getMessage());
             throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         return gasLimit;
@@ -160,7 +160,7 @@ public class ContractServiceImpl implements ContractService {
                 }
             }
         }catch (Throwable e){
-            Log.error("call api-moudle: imputedContractCreateGas error",e);
+            Log.error("call api-moudle: imputedContractCreateGas error",e.getMessage());
             throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR, parseErrorMsg(e));
         }
         return gasLimit;

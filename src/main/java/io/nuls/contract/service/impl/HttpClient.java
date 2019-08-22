@@ -23,7 +23,6 @@ public class HttpClient {
     @Autowired
     public HttpClient(ApiModuleInfoConfig infoConfig){
         try{
-            System.out.println(infoConfig.isCreateNewClient());
             String accessPath=infoConfig.getApiModuleAddress();
             Log.info("init api module service path: "+accessPath);
             ObjectMapper objectMapper = new ObjectMapper();

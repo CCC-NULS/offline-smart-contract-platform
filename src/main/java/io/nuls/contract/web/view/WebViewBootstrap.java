@@ -25,12 +25,15 @@
 
 package io.nuls.contract.web.view;
 
+import io.nuls.contract.autoconfig.ApiModuleInfoConfig;
+import io.nuls.core.model.StringUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.swing.*;
 import java.awt.*;
@@ -210,7 +213,7 @@ public class WebViewBootstrap extends Application implements Runnable, ActionLis
 //     */
     public void openBrowse() {
         String ip = "127.0.0.1";
-        String port = "80";
+        String port = System.getProperty("server.port");
         String url = "http://" + ip + ":" + port;
         openURL(url);
     }

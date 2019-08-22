@@ -95,7 +95,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             Object newValue=getMethod.invoke(infoConfig);
             Log.info("The value of configuration parameter \""+property+"\" changed from "+oldVlue+" to "+newValue);
         }catch(Exception e){
-            Log.error(e);
+            Log.error(e.getMessage());
         }
         return map;
     }
@@ -109,7 +109,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             Account account=accountService.createAccount(chainId,password);
             map.put("address",account.getAddress().toString());
         }catch (NulsException e){
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e.getErrorCode());
         }
         return map;
@@ -127,7 +127,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try {
              result=accountService.removeAccount(chainId,address,password);
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e.getErrorCode());
         }
         return result;
@@ -145,7 +145,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try {
             account = accountService.getAccount(chainId,address);
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e.getErrorCode());
         }
 
@@ -160,7 +160,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
                 accountInfo.setAlias(accountForChain.getAlias());
                 return accountInfo;
             } catch (NulsException e) {
-                Log.error(e);
+                Log.error(e.getMessage());
                 throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
             }
         }else {
@@ -183,7 +183,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try {
             accountList = accountService.getAccountList(chainId);
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e.getErrorCode());
         }
         int totalSize=0;
@@ -224,7 +224,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try {
             backupFileName = accountKeyStoreService.backupAccountToKeyStore(filePath,chainId, address, password);
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e.getErrorCode());
         }
         Map<String,String> map = new HashMap<String,String>();
@@ -248,10 +248,10 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             map.put("address",account.getAddress().toString());
             return map;
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode());
         }catch (IOException e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e);
         }
     }
@@ -271,7 +271,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             map.put("address",account.getAddress().toString());
             return map;
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode());
         }
     }
@@ -290,7 +290,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             map.put("privateKey",unencryptedPrivateKey);
             return map;
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode());
         }
     }
@@ -301,7 +301,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try{
             isSuccess=contractService.validateContractCreate(chainId,sender,gasLimit,price,contractCode,args);
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
         Map<String, Boolean> params = new HashMap<>();
@@ -352,7 +352,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try {
             account = accountService.getAccount(chainId,sender);
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode());
         }
         if(account==null){
@@ -382,7 +382,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             }
             isSuccess=contractService.validateContractCreate(chainId,sender,gasLimit,price,contractCode,args);
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
 
@@ -437,12 +437,12 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
                    throw new NulsRuntimeException(RpcErrorCode.BROADCAST_TX_ERROR);
                }
              }catch (NulsException e) {
-               Log.error(e);
+               Log.error(e.format());
                throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
            }catch(NulsRuntimeException e){
                throw e;
            }catch (Throwable e){
-               Log.error(e);
+               Log.error(e.getMessage());
                throw new NulsRuntimeException(RpcErrorCode.CONTRACT_TX_CREATE_ERROR);
            }
         }else {
@@ -499,7 +499,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             map.put("gasLimit",gamLimit);
             return map;
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
     }
@@ -514,7 +514,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             Map result=contractService.getContractConstructor(chainId,contractCode);
             return result;
          } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
     }
@@ -532,7 +532,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
                 throw new NulsRuntimeException(RpcErrorCode.GET_CONTRACT_INFO_FAILED);
             }
         } catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
     }
@@ -570,14 +570,14 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try{
             argsTypes= contractService.getContractMethodArgsTypes(chainId, contractAddress, methodName);
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
         String[][] convertArgs = ContractUtil.twoDimensionalArray(args, argsTypes);
         try{
             validate=contractService.validateContractCall(chainId,sender,value,gasLimit,price,contractAddress,methodName,methodDesc,args);
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(RpcErrorCode.VALIADE_CONTRACT_CALL_ERROR,e.getMessage());
         }
         if(!validate){
@@ -628,7 +628,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         }catch(NulsRuntimeException e){
             throw e;
         }catch (Throwable e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e);
         }
     }
@@ -646,7 +646,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try{
             validate =contractService.validateContractDelete(chainId, sender, contractAddress);
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
 
@@ -695,7 +695,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         }catch(NulsRuntimeException e){
             throw e;
         }catch (Throwable e) {
-            Log.error(e);
+            Log.error(e.getMessage());
             throw new NulsRuntimeException(e);
         }
     }
@@ -714,7 +714,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             map.put("methodReturn",invokeResult);
             return map;
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
     }
@@ -728,7 +728,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         try{
             argsTypes= contractService.getContractMethodArgsTypes(chainId, contractAddress, methodName);
         }catch (NulsException e) {
-            Log.error(e);
+            Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
         Map<String,String[]> map = new HashMap<String,String[]>();
