@@ -28,6 +28,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
             Map<String, JsonServiceExporter> beansOfType = contextRefreshedEvent.getApplicationContext().getBeansOfType(JsonServiceExporter.class);
             for(JsonServiceExporter bean : beansOfType.values()) {
                 bean.setErrorResolver(DefineErrorResolver.INSTANCE);
+                bean.setShouldLogInvocationErrors(false);
                 bean.afterPropertiesSet();
             }
             new Thread(new WebViewBootstrap()).start();
