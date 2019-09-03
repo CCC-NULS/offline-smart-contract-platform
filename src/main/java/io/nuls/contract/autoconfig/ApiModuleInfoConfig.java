@@ -45,6 +45,9 @@ public class ApiModuleInfoConfig  implements InitializingBean {
 
     private String defaultJarFilePath;
 
+    @Value("${version}")
+    private String version;
+
     public  String  getApiModuleAddress() {
         if(StringUtils.isNotBlank(this.apiModuleAddress) && !this.apiModuleAddress.toLowerCase().startsWith("http")){
             this.apiModuleAddress = "http://" + this.apiModuleAddress;
@@ -159,6 +162,14 @@ public class ApiModuleInfoConfig  implements InitializingBean {
 
     public void setDefaultJarFilePath(String defaultJarFilePath) {
         this.defaultJarFilePath = defaultJarFilePath;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @Override

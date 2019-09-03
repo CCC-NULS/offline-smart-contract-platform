@@ -48,6 +48,9 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -75,6 +78,42 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
 
     @Autowired
     private ChainService chainService;
+
+    @Override
+    public Map getVersionInfo() {
+        Map<String,Object> map = new HashMap<String,Object>();
+        StringBuffer document = new StringBuffer();
+        String netVersion="unkown";
+        String myVersion=infoConfig.getVersion();
+        String desc="";
+        try{
+            URL url = new URL("https://repo1.maven.org/maven2/io/nuls/v2/off-smartcontract-api/maven-metadata.xml");//远程url地址
+            URLConnection conn = url.openConnection();
+            BufferedReader  reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line = null;
+            while ((line = reader.readLine()) != null){
+                document.append(line + " ");
+            }
+            reader.close();
+            String xml=document.toString();
+            if(StringUtils.isNotBlank(xml)){
+                 netVersion=xml.substring(xml.indexOf("<latest>")+8,xml.indexOf("</latest>"));
+            }
+        }catch(Exception e){
+            Log.error("获取中央仓库的off-smartcontract-api版本信息失败",e.getMessage());
+        }
+        if(!netVersion.equals("unkown")){
+            if(myVersion.equals(netVersion)){
+                desc="本地版本已经为最新版本，版本号为"+netVersion;
+            }else{
+                desc="本地版本为"+myVersion+" ,最新版本为"+netVersion+" , 请点击Maven插件的Reimport重新导入最新版本";
+            }
+        }else{
+            desc="未获取到最新版本信息，本地版本为"+myVersion;
+        }
+        map.put("version",desc);
+        return map;
+    }
 
     @Override
     public Map setProperty(String property, String value) {
