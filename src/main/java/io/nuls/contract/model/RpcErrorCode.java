@@ -38,6 +38,7 @@ public interface RpcErrorCode {
     ErrorCode PARSE_JSON_FAILD= ErrorCode.init("40006");
     ErrorCode FILE_OPERATION_FAILD= ErrorCode.init("40007");
     ErrorCode DATA_PARSE_ERROR = ErrorCode.init("40008");
+    ErrorCode SYSTEM_ERROR = ErrorCode.init("40009");
 
     //api module exception
     ErrorCode NULS_SERVICE_ERROR = ErrorCode.init("50001");

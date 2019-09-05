@@ -135,6 +135,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             Log.info("The value of configuration parameter \""+property+"\" changed from "+oldVlue+" to "+newValue);
         }catch(Exception e){
             Log.error(e.getMessage());
+            throw new NulsRuntimeException(RpcErrorCode.SYSTEM_ERROR);
         }
         return map;
     }
