@@ -86,6 +86,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         String netVersion="unkown";
         String myVersion=infoConfig.getVersion();
         String desc="";
+        String isNew="N";
         try{
             URL url = new URL("https://repo1.maven.org/maven2/io/nuls/v2/off-smartcontract-api/maven-metadata.xml");//远程url地址
             URLConnection conn = url.openConnection();
@@ -105,6 +106,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         if(!netVersion.equals("unkown")){
             if(myVersion.equals(netVersion)){
                 desc="本地版本已经为最新版本，版本号为"+netVersion;
+                isNew="Y";
             }else{
                 desc="本地版本为"+myVersion+" ,最新版本为"+netVersion+" , 请点击Maven插件的Reimport重新导入最新版本";
             }
@@ -112,6 +114,7 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             desc="未获取到最新版本信息，本地版本为"+myVersion;
         }
         map.put("version",desc);
+        map.put("isNew",isNew);
         return map;
     }
 
