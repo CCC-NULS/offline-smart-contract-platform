@@ -1,6 +1,7 @@
 package io.nuls.contract.service.impl;
 
 import io.nuls.contract.model.RpcErrorCode;
+import io.nuls.contract.model.vo.TransactionInfo;
 import io.nuls.contract.service.TransactionService;
 import io.nuls.core.exception.NulsException;
 import io.nuls.core.exception.NulsRuntimeException;
@@ -29,6 +30,16 @@ public class TransactionServiceImpl implements TransactionService {
             throw new NulsRuntimeException(RpcErrorCode.NULS_SERVICE_ERROR,result.get("msg").toString());
         }
         return isSuccess;
+    }
+
+    public TransactionInfo getTx(int chainId, String txHash)throws NulsException {
+        TransactionInfo info= null;
+        try {
+            info = httpClient.getRpcHttpClient().invoke("getTx",new Object[]{chainId,txHash}, TransactionInfo.class);
+        } catch (Throwable e) {
+            throw new NulsException(RpcErrorCode.NULS_SERVICE_ERROR,e.getMessage());
+        }
+        return info;
     }
 
 

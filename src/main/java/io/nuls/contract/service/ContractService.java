@@ -1,6 +1,8 @@
 package io.nuls.contract.service;
 
 import io.nuls.contract.account.model.bo.ContractInfo;
+import io.nuls.contract.model.ContractResultInfo;
+import io.nuls.contract.model.deserialization.ContractResultDataDto;
 import io.nuls.core.exception.NulsException;
 
 import java.math.BigInteger;
@@ -27,4 +29,6 @@ public interface ContractService {
     public String invokeView(int chainId, Object contractAddress, Object methodName, Object methodDesc, Object args) throws NulsException;
 
     public ContractInfo getContract(int chainId, String contractAddress) throws NulsException;
+
+    public ContractResultDataDto getContractTxResult(int chainId, String txHash) throws NulsException;
 }

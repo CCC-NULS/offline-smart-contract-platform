@@ -54,4 +54,9 @@ public interface OfflineContractResource {
     public Map  invokeContractViewMethod(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "contractAddress")String contractAddress, @JsonRpcParam(value = "methodName")String methodName, @JsonRpcParam(value = "methodDesc")String methodDesc, @JsonRpcParam(value = "args")Object[] args);
 
     public Map getContractMethodArgsTypes(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "contractAddress")String contractAddress, @JsonRpcParam(value = "methodName")String methodName);
+
+    public Map getContractExecuteResultInfo(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "txHash")String txHash);
+
+    public Map getContractExecuteArgsInfo(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "txHash")String txHash,@JsonRpcParam(value = "txType")int txType);
+
 }

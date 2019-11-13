@@ -29,6 +29,7 @@ public interface RpcErrorCode {
     ErrorCode GET_CONTRACT_INFO_FAILED= ErrorCode.init("30005");
     ErrorCode VALIADE_CONTRACT_CALL_ERROR= ErrorCode.init("30006");
     ErrorCode VALIADE_CONTRACT_DELETE_ERROR= ErrorCode.init("30007");
+    ErrorCode GET_TX_INFO_FAILED= ErrorCode.init("30008");
 
     ErrorCode PARAMETER_ERROR= ErrorCode.init("40001");
     ErrorCode NULL_PARAMETER = ErrorCode.init("40002");

@@ -1,9 +1,11 @@
 package io.nuls.contract.rpc.resource.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.googlecode.jsonrpc4j.JsonRpcParam;
 import com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceImpl;
 import io.nuls.base.RPCUtil;
 import io.nuls.base.basic.AddressTool;
+import io.nuls.base.basic.NulsByteBuffer;
 import io.nuls.base.data.Address;
 import io.nuls.base.data.CoinData;
 import io.nuls.base.data.NulsHash;
@@ -16,6 +18,12 @@ import io.nuls.contract.account.model.bo.ContractInfo;
 import io.nuls.contract.account.model.po.AccountKeyStoreDto;
 import io.nuls.contract.autoconfig.ApiModuleInfoConfig;
 import io.nuls.contract.constant.ContractConstant;
+import io.nuls.contract.constant.TxType;
+import io.nuls.contract.model.ContractResultInfo;
+import io.nuls.contract.model.deserialization.CallContractDataDto;
+import io.nuls.contract.model.deserialization.ContractResultDataDto;
+import io.nuls.contract.model.deserialization.CreateContractDataDto;
+import io.nuls.contract.model.deserialization.DeleteContractDataDto;
 import io.nuls.contract.model.vo.AccountInfoVo;
 import io.nuls.contract.model.vo.ChainInfo;
 import io.nuls.contract.model.vo.ContractInfoVo;
@@ -28,6 +36,7 @@ import io.nuls.contract.model.tx.DeleteContractTransaction;
 import io.nuls.contract.model.txdata.CallContractData;
 import io.nuls.contract.model.txdata.CreateContractData;
 import io.nuls.contract.model.txdata.DeleteContractData;
+import io.nuls.contract.model.vo.TransactionInfo;
 import io.nuls.contract.rpc.resource.OfflineContractResource;
 import io.nuls.contract.service.*;
 import io.nuls.contract.utils.ContractUtil;
@@ -40,8 +49,8 @@ import io.nuls.core.log.Log;
 import io.nuls.core.model.FormatValidUtils;
 import io.nuls.core.parse.JSONUtils;
 import io.nuls.core.rockdb.util.DBUtils;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -778,5 +787,81 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         map.put("argsTypes",argsTypes);
         return map;
     }
+
+    @Override
+    public Map getContractExecuteResultInfo(int chainId, String txHash) {
+        if (StringUtils.isBlank(txHash)) {
+            throw new NulsRuntimeException(RpcErrorCode.NULL_PARAMETER,"txHash");
+        }
+        Map<String,String> map = new HashMap<String,String>();
+        String contractResult="";
+        ContractResultDataDto contractResultInfo = null;
+        try {
+            contractResultInfo = contractService.getContractTxResult(chainId,txHash);
+            contractResult=JSONUtils.obj2PrettyJson(contractResultInfo);
+        } catch (JsonProcessingException e) {
+            Log.error(e.getMessage());
+            throw new NulsRuntimeException(RpcErrorCode.PARSE_JSON_FAILD,e.getMessage());
+        } catch (NulsException e) {
+            Log.error(e.format());
+            throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
+        }
+        map.put("contractResult",contractResult);
+        return map;
+    }
+
+    /**
+     *
+     * @param chainId
+     * @param txHash   交易hash值
+     * @param txType  15:创建合约,16: 调用合约,17: 删除合约
+     * @return
+     */
+    @Override
+    public Map getContractExecuteArgsInfo(int chainId, String txHash,int txType) {
+        Map<String,String> map = new HashMap<String,String>();
+        String contractArgs="";
+        if (StringUtils.isBlank(txHash)) {
+            throw new NulsRuntimeException(RpcErrorCode.NULL_PARAMETER,"txHash");
+        }
+        try {
+            TransactionInfo info =transactionService.getTx(chainId,txHash);
+            if(info!=null){
+                String dataHex =info.getTxDataHex();
+                if(StringUtils.isBlank(dataHex)){
+                    throw new NulsRuntimeException(RpcErrorCode.GET_TX_INFO_FAILED);
+                }
+                if(TxType.CREATE_CONTRACT==txType){
+                    CreateContractData data = new CreateContractData();
+                    data.parse(new NulsByteBuffer(Hex.decode(dataHex)));
+                    CreateContractDataDto dto = new CreateContractDataDto(data);
+                    contractArgs=JSONUtils.obj2PrettyJson(dto);
+                }else if(TxType.CALL_CONTRACT==txType){
+                    CallContractData data = new CallContractData();
+                    data.parse(new NulsByteBuffer(Hex.decode(dataHex)));
+                    CallContractDataDto dto = new CallContractDataDto(data);
+                    contractArgs=JSONUtils.obj2PrettyJson(dto);
+                }else if(TxType.DELETE_CONTRACT==txType){
+                    DeleteContractData data = new DeleteContractData();
+                    data.parse(new NulsByteBuffer(Hex.decode(dataHex)));
+                    DeleteContractDataDto dto = new DeleteContractDataDto(data);
+                    contractArgs=JSONUtils.obj2PrettyJson(dto);
+                }else{
+                    throw new NulsRuntimeException(RpcErrorCode.PARAMETER_ERROR,"txType");
+                }
+            }else{
+                throw new NulsRuntimeException(RpcErrorCode.GET_TX_INFO_FAILED);
+            }
+        } catch (JsonProcessingException e) {
+            Log.error(e.getMessage());
+            throw new NulsRuntimeException(RpcErrorCode.PARSE_JSON_FAILD,e.getMessage());
+        } catch (NulsException e) {
+            Log.error(e.format());
+            throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
+        }
+        map.put("args",contractArgs);
+        return map;
+    }
+
 
 }
