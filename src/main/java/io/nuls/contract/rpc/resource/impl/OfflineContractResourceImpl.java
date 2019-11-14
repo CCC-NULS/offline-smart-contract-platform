@@ -793,20 +793,15 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
         if (StringUtils.isBlank(txHash)) {
             throw new NulsRuntimeException(RpcErrorCode.NULL_PARAMETER,"txHash");
         }
-        Map<String,String> map = new HashMap<String,String>();
-        String contractResult="";
+        Map<String,Object> map = new HashMap<String,Object>();
         ContractResultDataDto contractResultInfo = null;
         try {
             contractResultInfo = contractService.getContractTxResult(chainId,txHash);
-            contractResult=JSONUtils.obj2PrettyJson(contractResultInfo);
-        } catch (JsonProcessingException e) {
-            Log.error(e.getMessage());
-            throw new NulsRuntimeException(RpcErrorCode.PARSE_JSON_FAILD,e.getMessage());
         } catch (NulsException e) {
             Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
         }
-        map.put("contractResult",contractResult);
+        map.put("contractResult",contractResultInfo);
         return map;
     }
 
@@ -819,8 +814,8 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
      */
     @Override
     public Map getContractExecuteArgsInfo(int chainId, String txHash,int txType) {
-        Map<String,String> map = new HashMap<String,String>();
-        String contractArgs="";
+        Map<String,Object> map = new HashMap<String,Object>();
+        Object  contractArgs = null;
         if (StringUtils.isBlank(txHash)) {
             throw new NulsRuntimeException(RpcErrorCode.NULL_PARAMETER,"txHash");
         }
@@ -835,26 +830,23 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
                     CreateContractData data = new CreateContractData();
                     data.parse(new NulsByteBuffer(Hex.decode(dataHex)));
                     CreateContractDataDto dto = new CreateContractDataDto(data);
-                    contractArgs=JSONUtils.obj2PrettyJson(dto);
+                    contractArgs=dto;
                 }else if(TxType.CALL_CONTRACT==txType){
                     CallContractData data = new CallContractData();
                     data.parse(new NulsByteBuffer(Hex.decode(dataHex)));
                     CallContractDataDto dto = new CallContractDataDto(data);
-                    contractArgs=JSONUtils.obj2PrettyJson(dto);
+                    contractArgs=dto;
                 }else if(TxType.DELETE_CONTRACT==txType){
                     DeleteContractData data = new DeleteContractData();
                     data.parse(new NulsByteBuffer(Hex.decode(dataHex)));
                     DeleteContractDataDto dto = new DeleteContractDataDto(data);
-                    contractArgs=JSONUtils.obj2PrettyJson(dto);
+                    contractArgs=dto;
                 }else{
                     throw new NulsRuntimeException(RpcErrorCode.PARAMETER_ERROR,"txType");
                 }
             }else{
                 throw new NulsRuntimeException(RpcErrorCode.GET_TX_INFO_FAILED);
             }
-        } catch (JsonProcessingException e) {
-            Log.error(e.getMessage());
-            throw new NulsRuntimeException(RpcErrorCode.PARSE_JSON_FAILD,e.getMessage());
         } catch (NulsException e) {
             Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
