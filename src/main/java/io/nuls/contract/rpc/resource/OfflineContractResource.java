@@ -33,6 +33,8 @@ public interface OfflineContractResource {
 
     public Map exportPriKeyByAddress(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "address")String address,@JsonRpcParam(value = "password")String password);
 
+    public Map exportKeyByAddress(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "address")String address, @JsonRpcParam(value = "password")String password);
+
     public Map validateContractCreate(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "sender")String sender, @JsonRpcParam(value = "gasLimit")long gasLimit, @JsonRpcParam(value = "price")long price, @JsonRpcParam(value = "contractCode")String contractCode, @JsonRpcParam(value = "args")Object[] args);
 
     public Map uploadContractJar(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "jarFileData")String jarFileData);

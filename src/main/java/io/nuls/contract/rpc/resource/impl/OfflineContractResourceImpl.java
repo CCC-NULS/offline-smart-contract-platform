@@ -11,10 +11,7 @@ import io.nuls.base.data.CoinData;
 import io.nuls.base.data.NulsHash;
 import io.nuls.base.signture.P2PHKSignature;
 import io.nuls.base.signture.TransactionSignature;
-import io.nuls.contract.account.model.bo.Account;
-import io.nuls.contract.account.model.bo.AccountInfo;
-import io.nuls.contract.account.model.bo.BalanceInfo;
-import io.nuls.contract.account.model.bo.ContractInfo;
+import io.nuls.contract.account.model.bo.*;
 import io.nuls.contract.account.model.po.AccountKeyStoreDto;
 import io.nuls.contract.autoconfig.ApiModuleInfoConfig;
 import io.nuls.contract.constant.ContractConstant;
@@ -157,9 +154,17 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
     @Override
     public Map createAccount(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "password")String password) {
         Map<String,String> map = new HashMap<String,String>();
+        String priKey="";
         try{
             Account account=accountService.createAccount(chainId,password);
+            if (account.isEncrypted()) {
+                byte[] priKeyBytes = account.getPriKey(password);
+                priKey=HexUtil.encode(priKeyBytes);
+            } else {
+                priKey=HexUtil.encode(account.getPriKey());
+            }
             map.put("address",account.getAddress().toString());
+            map.put("prikey",priKey);
         }catch (NulsException e){
             Log.error(e.getMessage());
             throw new NulsRuntimeException(e.getErrorCode());
@@ -346,6 +351,26 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             throw new NulsRuntimeException(e.getErrorCode());
         }
     }
+
+    @Override
+    public Map exportKeyByAddress(int chainId, String address, String password) {
+        if (address == null) {
+            throw new NulsRuntimeException(RpcErrorCode.NULL_PARAMETER,"address");
+        }
+        Map<String,String> map = new HashMap<String,String>();
+        try {
+            String unencryptedPrivateKey= accountService.getPrivateKey(chainId,address,password);
+            map.put("privateKey",unencryptedPrivateKey);
+            AccountKeyStore keyStore =accountKeyStoreService.accountToKeyStore(chainId,address,password);
+            map.put("aesPri",keyStore.getEncryptedPrivateKey());
+            map.put("pubKey",HexUtil.encode(keyStore.getPubKey()));
+            return map;
+        } catch (NulsException e) {
+            Log.error(e.format());
+            throw new NulsRuntimeException(e.getErrorCode());
+        }
+    }
+
 
     @Override
     public Map validateContractCreate(int chainId, String sender, long gasLimit, long price, String contractCode, Object[] args) {
