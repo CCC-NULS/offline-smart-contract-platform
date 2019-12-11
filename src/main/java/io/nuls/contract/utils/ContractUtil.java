@@ -1,5 +1,6 @@
 package io.nuls.contract.utils;
 
+import com.alibaba.fastjson.JSON;
 import io.nuls.base.data.BlockExtendsData;
 import io.nuls.base.data.BlockHeader;
 import io.nuls.core.exception.NulsRuntimeException;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 import static io.nuls.core.model.StringUtils.isBlank;
 
@@ -122,6 +124,18 @@ public class ContractUtil {
             throw new NulsRuntimeException(e);
         }
         return hexEncode;
+    }
+
+    public static Object[] convertArgsToObjectArray(Object[] args,String[] types){
+        List<Object> newArgs= new ArrayList<>();
+        for(int i=0;i<types.length;i++){
+            if(types[i].contains("[]")){
+                newArgs.add(JSON.parseArray(String.valueOf(args[i]),Object.class));
+            }else{
+                newArgs.add(args[i]);
+            }
+        }
+        return newArgs.toArray();
     }
 
 }

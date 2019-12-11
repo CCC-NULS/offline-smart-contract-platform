@@ -45,9 +45,13 @@ public interface OfflineContractResource {
 
     public Map imputedContractCreateGas(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "sender")String sender,@JsonRpcParam(value = "contractCode")String contractCode,@JsonRpcParam(value = "args")Object[] args);
 
+    public Map imputedContractCallGas(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "sender")String sender,@JsonRpcParam(value = "value")BigInteger value,@JsonRpcParam(value = "contractAddress")String contractAddress,@JsonRpcParam(value = "methodName")String methodName, @JsonRpcParam(value = "methodDesc")String methodDesc,@JsonRpcParam(value = "args")Object[] args);
+
     public Map getContractConstructor(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "contractCode")String contractCode);
 
     public ContractInfoVo getContract(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "contractAddress")String contractAddress);
+
+    public Map validateContractCall(@JsonRpcParam(value = "chainId")int chainId, @JsonRpcParam(value = "sender")String sender,@JsonRpcParam(value = "value")BigInteger value,@JsonRpcParam(value = "gasLimit")long gasLimit, @JsonRpcParam(value = "price")long price,@JsonRpcParam(value = "contractAddress")String contractAddress,@JsonRpcParam(value = "methodName")String methodName, @JsonRpcParam(value = "methodDesc")String methodDesc,@JsonRpcParam(value = "args")Object[] args);
 
     public Map callContract(@JsonRpcParam(value = "chainId")int chainId,@JsonRpcParam(value = "assetChainId")int assetChainId, @JsonRpcParam(value = "assetId")int assetId, @JsonRpcParam(value = "sender")String sender,@JsonRpcParam(value = "password")String password, @JsonRpcParam(value = "contractAddress")String contractAddress,@JsonRpcParam(value = "value")BigInteger value,@JsonRpcParam(value = "methodName")String methodName, @JsonRpcParam(value = "methodDesc")String methodDesc,@JsonRpcParam(value = "args")Object[] args, @JsonRpcParam(value = "gasLimit")long gasLimit, @JsonRpcParam(value = "price")long price,@JsonRpcParam(value = "remark")String remark);
 
