@@ -379,7 +379,9 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
     public Map validateContractCreate(int chainId, String sender, long gasLimit, long price, String contractCode, Object[] args) {
         boolean isSuccess=true;
         try{
-            isSuccess=contractService.validateContractCreate(chainId,sender,gasLimit,price,contractCode,args);
+            String[] constructorArgsTypes=contractService.getContractConstructorArgsTypes(chainId,contractCode);
+            Object[] newArgs=ContractUtil.convertArgsToObjectArray(args,constructorArgsTypes);
+            isSuccess=contractService.validateContractCreate(chainId,sender,gasLimit,price,contractCode,newArgs);
         }catch (NulsException e) {
             Log.error(e.format());
             throw new NulsRuntimeException(e.getErrorCode(),e.getMessage());
@@ -460,6 +462,8 @@ public class OfflineContractResourceImpl implements OfflineContractResource {
             if (argTypes==null){
                 throw new NulsRuntimeException(RpcErrorCode.GET_CONSTRUSTOR_PARAMETER);
             }
+            args=ContractUtil.convertArgsToObjectArray(args,argTypes);
+
             isSuccess=contractService.validateContractCreate(chainId,sender,gasLimit,price,contractCode,args);
         }catch (NulsException e) {
             Log.error(e.format());

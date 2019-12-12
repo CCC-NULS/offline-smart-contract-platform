@@ -128,12 +128,17 @@ public class ContractUtil {
 
     public static Object[] convertArgsToObjectArray(Object[] args,String[] types){
         List<Object> newArgs= new ArrayList<>();
-        for(int i=0;i<types.length;i++){
-            if(types[i].contains("[]")){
-                newArgs.add(JSON.parseArray(String.valueOf(args[i]),Object.class));
-            }else{
-                newArgs.add(args[i]);
+        try{
+            for(int i=0;i<types.length;i++){
+                if(types[i].contains("[]") && args[i] instanceof String){
+                    newArgs.add(JSON.parseArray(String.valueOf(args[i]),Object.class));
+                }else{
+                    newArgs.add(args[i]);
+                }
             }
+        }catch (Exception e){
+            Log.error("parse args error.", e);
+            throw new NulsRuntimeException(e);
         }
         return newArgs.toArray();
     }
